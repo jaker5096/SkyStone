@@ -56,6 +56,8 @@ public class IMBEN extends OpMode
     private Servo Rightflipper = null;
     private Servo Leftscoop = null;
     private Servo Rightscoop = null;
+    private DcMotor leftRoly = null;
+    private DcMotor rightRoly = null;
 
     //bootleeeeeen
     private Boolean hasTopLeft =Boolean.FALSE;
@@ -66,7 +68,8 @@ public class IMBEN extends OpMode
     private Boolean hasRightflipper =Boolean.FALSE;
     private Boolean hasLeftscoop =Boolean.FALSE;
     private Boolean hasRightscoop =Boolean.FALSE;
-
+    private Boolean hasleftRoly =Boolean.FALSE;
+    private Boolean hasrightRoly =Boolean.FALSE;
 
 
     /*
@@ -158,6 +161,24 @@ public class IMBEN extends OpMode
         catch (IllegalArgumentException iax)  {
             telemetry.addData("Rightscoop", "Failed");
         }
+        try{
+            leftRoly  = hardwareMap.get(DcMotor.class, "left_Roly");
+            hasleftRoly = Boolean.TRUE;
+            leftRoly.setDirection(DcMotor.Direction.FORWARD);
+            telemetry.addData("leftRoly", "Initialized");
+        }
+        catch (IllegalArgumentException iax)  {
+            telemetry.addData("leftRoly", "Failed");
+        }
+        try{
+            rightRoly  = hardwareMap.get(DcMotor.class, "right_Roly");
+            hasrightRoly = Boolean.TRUE;
+            rightRoly.setDirection(DcMotor.Direction.REVERSE);
+            telemetry.addData("rightRoly", "Initialized");
+        }
+        catch (IllegalArgumentException iax)  {
+            telemetry.addData("rightRoly", "Failed");
+        }
 
 //        // Initialize the hardware variables. Note that the strings used here as parameters
 //        // to 'get' must correspond to the names assigned during the robot configuration
@@ -209,11 +230,13 @@ public class IMBEN extends OpMode
         double gamepad2RightFlipper = gamepad2.right_trigger;
         double gamepad2LeftScoop = -gamepad2.left_stick_y;
         double gamepad2RightScoop = -gamepad2.right_stick_y;
-
+        double rolliOut = gamepad2.dpad_up;
+        double rolliIn = gamepad2.dpad_down;
         double FrontRightPower = 0;
         double FrontLeftPower = 0;
         double BackRightPower = 0;
         double BackLeftPower = 0;
+
 //        double LeftFlipperPotition = 0;
 //        double RightFlipperPotition = 0;
 //        double LeftScoopPotition = 0;
@@ -322,6 +345,13 @@ public class IMBEN extends OpMode
         if(hasRightscoop) {
             Rightscoop.setPosition(gamepad2RightScoop);
         }
+        if(hasleftRoly){
+            leftRoly.setPower (rolyOut + rolyIn)
+        }
+        if(hasrightRoly) {
+            rightRoly.setPower (rolyOut + rolyIn)
+        }
+
 
 
 
@@ -336,7 +366,7 @@ public class IMBEN extends OpMode
         telemetry.addData("MotorPower","Left Back(%.2f), Right Back (%.2f)", BackLeftPower, BackRightPower);
         telemetry.addData("ScoopPotiton","Left (%.2f), Right (%.2f)", gamepad2LeftScoop, gamepad2RightScoop);
         telemetry.addData("FlipperPotiton","Left (%.2f), Right (%.2f)", gamepad2LeftFlipper, gamepad2RightFlipper);
-
+        telemetry.addData("rolliMotors","Left (%.2f), Right (%.2f)", rolyOut + rolyIn, rolyOut + rolyIn);
     }
 
     @Override
