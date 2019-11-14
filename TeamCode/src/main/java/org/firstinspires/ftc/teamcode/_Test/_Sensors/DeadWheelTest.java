@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode._Test._Sensors;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode._Libs.AutoLib;
@@ -11,7 +12,7 @@ import org.firstinspires.ftc.teamcode._Libs.AutoLib;
  * Test deadwheel consisting of a Tetrix motor encoder connected to an encode input of a RevHub
  */
 @Autonomous(name="Test: Deadwheel Sensor Test 1", group ="Test")
-//@Disabled
+@Disabled
 public class DeadWheelTest extends OpMode {
 
     DcMotor mMotor;

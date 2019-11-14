@@ -237,11 +237,6 @@ public class IMBEN extends OpMode
         double BackRightPower = 0;
         double BackLeftPower = 0;
 
-//        double LeftFlipperPotition = 0;
-//        double RightFlipperPotition = 0;
-//        double LeftScoopPotition = 0;
-//        double RightScoopPotition = 0;
-
         //this is getting rid of negative zero yay!
         if(LeftRight > -0.000001 && LeftRight < 0.000001){
             LeftRight = 0;
@@ -262,12 +257,15 @@ public class IMBEN extends OpMode
             LeftRight = 0;
 
         }
-        if(gamepad2LeftScoop < 0.0000001){
-            gamepad2LeftScoop = 0;
+        if(gamepad2LeftScoop < 0.2){
+            gamepad2LeftScoop = 0.2;
         }
 
-        if(gamepad2RightScoop < 0.000001){
-            gamepad2RightScoop = 0;
+        if(gamepad2RightScoop > 0.5){
+            gamepad2RightScoop = 0.5 ;
+        }
+        else if(gamepad2RightScoop < -0.5){
+            gamepad2RightScoop = - 0.5 ;
         }
 
         Angle = Math.toDegrees(Math.atan2(LeftRight,Forwardbackward));

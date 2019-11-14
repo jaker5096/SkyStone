@@ -1071,6 +1071,7 @@ public class AutoLib {
 
             // feed error through PID to get motor power value for heading correction
             float hdCorr = mPid.loop(error, (float) dt);
+            hdCorr = Range.clip(hdCorr, -.5f, .5f);
 
             // relative direction we want to move is difference between requested absolute direction and CURRENT orientation
             float relDir = SensorLib.Utils.wrapAngle(mDirection - heading);
@@ -1078,11 +1079,12 @@ public class AutoLib {
             // calculate relative front/back motor powers for fancy wheels to move us in requested relative direction
             AutoLib.MotorPowers mp = AutoLib.GetSquirrelyWheelMotorPowers(relDir);
 
-            // calculate powers of the 4 motors
-            double pFR = mp.Front() * mPower - hdCorr;
-            double pBR = mp.Back() * mPower - hdCorr;
-            double pFL = mp.Front() * mPower + hdCorr;
-            double pBL = mp.Back() * mPower + hdCorr;
+            // calculate powers of the 4 motors ---
+            // for "standard" mecanum wheel arrangement (i.e. all roller axles pointing to bot center)
+            double pFR = mp.LeftFacing() * mPower - hdCorr;
+            double pBR = mp.RightFacing() * mPower - hdCorr;
+            double pFL = mp.RightFacing() * mPower + hdCorr;
+            double pBL = mp.LeftFacing() * mPower + hdCorr;
 
             // normalize powers so none has magnitude > maxPower
             double norm = normalize(mMaxPower, pFR, pBR, pFL, pBL);
@@ -1097,8 +1099,8 @@ public class AutoLib {
             // log some data
             if (mOpMode != null) {
                 mOpMode.telemetry.addData("heading ", heading);
-                mOpMode.telemetry.addData("front power ", mp.Front());
-                mOpMode.telemetry.addData("back power ", mp.Back());
+                mOpMode.telemetry.addData("right-facing power ", mp.RightFacing());
+                mOpMode.telemetry.addData("left-facing power ", mp.LeftFacing());
             }
 
             // guidance step always returns "done" so the CS in which it is embedded completes when
@@ -1317,10 +1319,10 @@ public class AutoLib {
         // update target direction, heading, and power --
         // used e.g. by interactive teleop modes to redirect the step from controller input
         public void setDirection(float direction) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setDirection(direction); }
-        public void setRelativeDirection(float direction) { ((GyroGuideStep)mSteps.get(0)).setRelativeDirection(direction); }
+        public void setRelativeDirection(float direction) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setRelativeDirection(direction); }
         public void setHeading(float heading) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setHeading(heading); }
         public void setPower(float power) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setPower(power); }
-        public void setMaxPower(float power) { ((GyroGuideStep)mSteps.get(0)).setMaxPower(power); }
+        public void setMaxPower(float power) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setMaxPower(power); }
     }
 
     // a Step that uses gyro input to stabilize the robot orientation while driving along a given absolute heading
@@ -1352,10 +1354,10 @@ public class AutoLib {
         // update target direction, heading, and power --
         // used e.g. by interactive teleop modes to redirect the step from controller input
         public void setDirection(float direction) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setDirection(direction); }
-        public void setRelativeDirection(float direction) { ((GyroGuideStep)mSteps.get(0)).setRelativeDirection(direction); }
+        public void setRelativeDirection(float direction) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setRelativeDirection(direction); }
         public void setHeading(float heading) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setHeading(heading); }
         public void setPower(float power) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setPower(power); }
-        public void setMaxPower(float power) { ((GyroGuideStep)mSteps.get(0)).setMaxPower(power); }
+        public void setMaxPower(float power) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setMaxPower(power); }
     }
 
     // a Step that uses gyro input to stabilize the robot orientation while driving along a given relative heading
@@ -1394,10 +1396,10 @@ public class AutoLib {
         // update target direction, heading, and power --
         // used e.g. by interactive teleop modes to redirect the step from controller input
         public void setDirection(float direction) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setDirection(direction); }
-        public void setRelativeDirection(float direction) { ((GyroGuideStep)mSteps.get(0)).setRelativeDirection(direction); }
+        public void setRelativeDirection(float direction) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setRelativeDirection(direction); }
         public void setHeading(float heading) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setHeading(heading); }
         public void setPower(float power) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setPower(power); }
-        public void setMaxPower(float power) { ((GyroGuideStep)mSteps.get(0)).setMaxPower(power); }
+        public void setMaxPower(float power) { ((SquirrelyGyroGuideStep)mSteps.get(0)).setMaxPower(power); }
     }
 
 
@@ -1494,18 +1496,22 @@ public class AutoLib {
 
     // example of a class used to return multiple values from a function call
     public static class MotorPowers {
-        public double mFront;
-        public double mBack;
+        double mFront;
+        double mBack;
+
         public MotorPowers(double front, double back) {
             mFront = front;
             mBack = back;
         }
-        public double Front() { return mFront; }
-        public double Back() { return mBack; }
+        public double RightFacing() { return mFront; }
+        public double LeftFacing() { return mBack; }
     }
 
     // this function computes the relative front/back power settings needed to move along a given
     // heading, relative to the current orientation of the robot.
+    // for "standard" mecanum wheel arrangement (i.e. all roller axles pointing to bot center)
+    // i.e. "Front" (left) is a wheel whose rollers point to the right on the top of the wheel, while
+    // "Back" (left) refers to a wheel whose rollers point to the left on the top of the wheel.
     public static MotorPowers GetSquirrelyWheelMotorPowers(
             double heading    // in degrees, zero = straight ahead, positive CCW, range +-180
     )
@@ -1578,13 +1584,13 @@ public class AutoLib {
 
             // create TimedMotorSteps to control the 4 motors
             if (fr != null)
-                this.add(new TimedMotorStep(fr, mp.Front()*power, seconds, stop));
+                this.add(new TimedMotorStep(fr, mp.LeftFacing()*power, seconds, stop));
             if (br != null)
-                this.add(new TimedMotorStep(br, mp.Back()*power, seconds, stop));
+                this.add(new TimedMotorStep(br, mp.RightFacing()*power, seconds, stop));
             if (fl != null)
-                this.add(new TimedMotorStep(fl, mp.Front()*power, seconds, stop));
+                this.add(new TimedMotorStep(fl, mp.RightFacing()*power, seconds, stop));
             if (bl != null)
-                this.add(new TimedMotorStep(bl, mp.Back()*power, seconds, stop));
+                this.add(new TimedMotorStep(bl, mp.LeftFacing()*power, seconds, stop));
         }
     }
 
@@ -1661,15 +1667,15 @@ public class AutoLib {
 
             // compute motor powers needed to go in that direction
             MotorPowers mp = GetSquirrelyWheelMotorPowers(robotHeading);
-            double frontPower = mp.Front() * mPower;
-            double backPower = mp.Back() * mPower;
+            double rightFacingPower = mp.RightFacing() * mPower;
+            double leftFacingPower = mp.LeftFacing() * mPower;
 
             // reduce motor powers when we're very close to the target position
             final double slowDist = 3.0*mError;   // start slowing down when we're this close
             double distToTarget = dirToTarget.magnitude();
             if (distToTarget < slowDist) {
-                frontPower *= distToTarget/slowDist;
-                backPower  *= distToTarget/slowDist;
+                rightFacingPower *= distToTarget/slowDist;
+                leftFacingPower  *= distToTarget/slowDist;
             }
 
             // are we there yet?
@@ -1677,7 +1683,7 @@ public class AutoLib {
 
             // optionally stop motors when we reach the target position
             if (bDone && mStop)
-                frontPower = backPower = 0;
+                rightFacingPower = leftFacingPower = 0;
 
             // output debug telemetry
             mOpMode.telemetry.addData("VSGS:", "target position: %s", mTargetPosition.multiplied(1.0f/25.4f).toString());    // inches
@@ -1685,10 +1691,10 @@ public class AutoLib {
 
             // update motors
             // assumed order is fr, br, fl, bl
-            mMotorSteps.get(0).setPower(frontPower);
-            mMotorSteps.get(1).setPower(backPower);
-            mMotorSteps.get(2).setPower(frontPower);
-            mMotorSteps.get(3).setPower(backPower);
+            mMotorSteps.get(0).setPower(leftFacingPower);
+            mMotorSteps.get(1).setPower(rightFacingPower);
+            mMotorSteps.get(2).setPower(rightFacingPower);
+            mMotorSteps.get(3).setPower(leftFacingPower);
 
             return bDone;
         }

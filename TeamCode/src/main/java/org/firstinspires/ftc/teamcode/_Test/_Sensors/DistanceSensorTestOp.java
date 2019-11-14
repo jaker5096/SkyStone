@@ -4,6 +4,7 @@ import android.view.View;
 
 import com.qualcomm.hardware.hitechnic.HiTechnicNxtUltrasonicSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.LightSensor;
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * this device must be attached to port 4 or 5 of the CORE LEGACY DEVICE module
  */
 @Autonomous(name="Test: Distance Sensor Test 1", group ="Test")
-//@Disabled
+@Disabled
 public class DistanceSensorTestOp extends OpMode {
 
     private UltrasonicSensor mDistanceSensor;
