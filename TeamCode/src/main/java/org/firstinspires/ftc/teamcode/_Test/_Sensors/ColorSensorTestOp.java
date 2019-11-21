@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode._Test._Sensors;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
@@ -10,7 +11,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
  * Test color sensor hardware
  */
 @Autonomous(name="Test: Color Sensor Test 1", group ="Test")
-//@Disabled
+@Disabled
 public class ColorSensorTestOp extends OpMode {
 
     private ColorSensor mColorSensor;

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode._Test._Sensors;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 
@@ -18,7 +19,7 @@ import static android.os.SystemClock.sleep;
  */
 
 @Autonomous(name="Test: REV IMU Test 1", group ="Test")
-//@Disabled
+@Disabled
 public class RevGyroTestOp extends OpMode {
 
     private BNO055IMUHeadingSensor mGyro;

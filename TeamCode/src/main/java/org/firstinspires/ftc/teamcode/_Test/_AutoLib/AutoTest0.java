@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode._Test._AutoLib;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode._Libs.AutoLib;
@@ -19,7 +20,7 @@ import org.firstinspires.ftc.teamcode._Libs.AutoLib;
  * if loop() is defined at that level of derivation as well. What???
  * Created by phanau on 2/15/17.
  */
-
+@Disabled
 class Step1 extends AutoLib.Step {
     OpMode mOpMode;
     int mCount;
@@ -57,7 +58,7 @@ class Step3 extends Step2 {
 
 
 @Autonomous(name="Test: AutoLib Sequencer Test 0", group ="Test")
-//@Disabled
+@Disabled
 public class AutoTest0 extends OpMode {
 
     AutoLib.Sequence mSequence;     // the root of the sequence tree

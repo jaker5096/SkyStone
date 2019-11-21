@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode._Test._AutoLib;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode._Libs.AutoLib;
@@ -14,7 +15,7 @@ import org.firstinspires.ftc.teamcode._Libs.AutoLib;
 
 
 @Autonomous(name="Test: AutoLib Sequencer Test 1", group ="Test")
-//@Disabled
+@Disabled
 public class AutoTest1 extends OpMode {
 
     AutoLib.Sequence mSequence;     // the root of the sequence tree

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode._Test._Drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -20,73 +21,8 @@ import java.util.ArrayList;
 
 // simple example sequence that tests encoder/gyro-based position integration to drive along a given path
 @Autonomous(name="Test: Pos Int Drive Test", group ="Test")
-//@Disabled
+@Disabled
 public class PosIntDriveTestOp extends OpMode {
-
-    // use a single motor encoder and gyro to track absolute field position
-    class EncoderGyroPosInt extends SensorLib.PositionIntegrator {
-        OpMode mOpMode;
-        HeadingSensor mGyro;
-        DcMotor[] mEncoderMotor;
-
-        int mEncoderPrev[];		// previous reading of motor encoder
-        boolean mFirstLoop;
-
-        int mCountsPerRev;
-        double mWheelDiam;
-
-        public EncoderGyroPosInt(OpMode opmode, HeadingSensor gyro, DcMotor[] encoderMotor, int countsPerRev, double wheelDiam, Position initialPosn)
-        {
-            super(initialPosn);
-            mOpMode = opmode;
-            mGyro = gyro;
-            mEncoderMotor = encoderMotor;
-            mFirstLoop = true;
-            mCountsPerRev = countsPerRev;
-            mWheelDiam = wheelDiam;
-            mEncoderPrev = new int[encoderMotor.length];
-        }
-
-        public boolean loop() {
-            // get initial encoder value
-            if (mFirstLoop) {
-                for (int i=0; i<mEncoderMotor.length; i++)
-                    mEncoderPrev[i] = mEncoderMotor[i].getCurrentPosition();
-                mFirstLoop = false;
-            }
-
-            // get current encoder values and compute average delta since last read
-            int encoderDist = 0;
-            for (int i=0; i<mEncoderMotor.length; i++) {
-                int encoder = mEncoderMotor[i].getCurrentPosition();
-                encoderDist += encoder - mEncoderPrev[i];
-                mEncoderPrev[i] = mEncoderMotor[i].getCurrentPosition();
-            }
-            encoderDist /= mEncoderMotor.length;
-
-            // get bearing from IMU gyro
-            double imuBearingDeg = mGyro.getHeading();
-
-            // update accumulated field position
-            double dist = (encoderDist * mWheelDiam * Math.PI)/mCountsPerRev;
-            boolean isXdrive = false; // (mOpMode.virtualBot.getClass() == XDriveBot.class);  // handle X-drive too ...
-            if (isXdrive)
-                dist *= Math.sqrt(2);   // each wheel rotation moves the bot further with X-drive
-            this.move(dist, imuBearingDeg);
-
-            if (mOpMode != null) {
-                mOpMode.telemetry.addData("EGPI position", String.format("%.2f", this.getX()) + ", " + String.format("%.2f", this.getY()));
-                //Position simPos = mOpMode.virtualBot.getPosition();     // get the "actual" position from the VirtualBot to see how well our PosInt is tracking ...
-                //mOpMode.telemetry.addData("Vbot position", String.format("%.2f", simPos.x) + ", " + String.format("%.2f", simPos.y));
-            }
-
-            return true;
-        }
-
-        public HeadingSensor getGyro() {
-            return mGyro;
-        }
-    }
 
     // return done when we're within tolerance distance of target position
     class PositionTerminatorStep extends AutoLib.MotorGuideStep {
@@ -134,13 +70,13 @@ public class PosIntDriveTestOp extends OpMode {
 
         OpMode mOpMode;
         Position mTarget;
-        EncoderGyroPosInt mPosInt;
+        SensorLib.EncoderGyroPosInt mPosInt;
         double mTol;
         float mMaxPower;
         float mMinPower = 0.25f;
         float mSgnPower;
 
-        public GyroPosIntGuideStep(OpMode opmode, EncoderGyroPosInt posInt, Position target,
+        public GyroPosIntGuideStep(OpMode opmode, SensorLib.EncoderGyroPosInt posInt, Position target,
                                    SensorLib.PID pid, ArrayList<AutoLib.SetPower> motorsteps, float power, double tol) {
             super(opmode, 0, posInt.getGyro(), pid, motorsteps, power);
             mOpMode = opmode;
@@ -189,12 +125,12 @@ public class PosIntDriveTestOp extends OpMode {
     class PosIntDriveToStep extends AutoLib.GuidedTerminatedDriveStep {
 
         OpMode mOpMode;
-        EncoderGyroPosInt mPosInt;
+        SensorLib.EncoderGyroPosInt mPosInt;
         Position mTarget;
         AutoLib.GyroGuideStep mGuideStep;
         PositionTerminatorStep mTerminatorStep;
 
-        public PosIntDriveToStep(OpMode opmode, EncoderGyroPosInt posInt, DcMotor[] motors,
+        public PosIntDriveToStep(OpMode opmode, SensorLib.EncoderGyroPosInt posInt, DcMotor[] motors,
                                  float power, SensorLib.PID pid, Position target, double tolerance, boolean stop)
         {
             super(opmode,
@@ -215,7 +151,7 @@ public class PosIntDriveTestOp extends OpMode {
     boolean bDone;                          // true when the programmed sequence is done
     boolean bSetup;                         // true when we're in "setup mode" where joysticks tweak parameters
     SensorLib.PID mPid;                     // PID controller for the sequence
-    EncoderGyroPosInt mPosInt;              // Encoder/gyro-based position integrator to keep track of where we are
+    SensorLib.EncoderGyroPosInt mPosInt;    // Encoder/gyro-based position integrator to keep track of where we are
     SensorLib.PIDAdjuster mPidAdjuster;     // for interactive adjustment of PID parameters
     RobotHardware rh;                       // standard hardware set for these tests
 
@@ -242,17 +178,16 @@ public class PosIntDriveTestOp extends OpMode {
         // create a PID adjuster for interactive tweaking (see loop() below)
         mPidAdjuster = new SensorLib.PIDAdjuster(this, mPid, gamepad1);
 
-        // on Ratbot, only two motor encoders are hooked up: [1]br, [2]fl
-        DcMotor[] encoderMotors = new DcMotor[4];
-        encoderMotors[0] = encoderMotors[1] = rh.mMotors[1];
-        encoderMotors[2] = encoderMotors[3] = rh.mMotors[2];
+        // on Ratbot, only two motor encoders are currently hooked up: [1]br, [3]bl
+        DcMotor[] encoderMotors = new DcMotor[2];
+        encoderMotors[0] = rh.mMotors[1];
+        encoderMotors[1] = rh.mMotors[3];
 
         // create Encoder/gyro-based PositionIntegrator to keep track of where we are on the field
         int countsPerRev = 28*20;		// for 20:1 gearbox motor @ 28 counts/motorRev
         double wheelDiam = 4.0;		    // wheel diameter (in)
-        Position initialPosn = new Position(DistanceUnit.INCH, 0.0, 0.0, 0.0, 0);
-        // example starting position: at origin of field
-        mPosInt = new EncoderGyroPosInt(this, rh.mIMU, encoderMotors, countsPerRev, wheelDiam, initialPosn);
+        Position initialPosn = new Position(DistanceUnit.INCH, 0.0, 0.0, 0.0, 0); // example starting position: at origin of field
+        mPosInt = new SensorLib.EncoderGyroPosInt(this, rh.mIMU, encoderMotors, countsPerRev, wheelDiam, initialPosn);
 
 
         // create an autonomous sequence with the steps to drive
@@ -263,30 +198,27 @@ public class PosIntDriveTestOp extends OpMode {
         // create the root Sequence for this autonomous OpMode
         mSequence = new AutoLib.LinearSequence();
 
-        // add a bunch of timed "legs" to the sequence - use Gyro heading convention of positive degrees CW from initial heading
+        // add a bunch of movements to the sequence
         float tol = 1.0f;   // tolerance in inches
         float timeout = 2.0f;   // seconds
 
-        // add a bunch of position integrator "legs" to the sequence -- uses absolute field coordinate system in inches
+        // these position integrator steps use the encoder-based position integrator and IMU-gyro to move
+        // the robot to a sequence of positions specified in absolute field coordinate system in inches
         mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, movePower, mPid,
                 new Position(DistanceUnit.INCH, 0, 36, 0., 0), tol, false));
         mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, movePower, mPid,
                 new Position(DistanceUnit.INCH, 36, 36, 0., 0), tol, false));
-        mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, movePower, mPid,                   // do this move backwards!
+        mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, movePower, mPid,
                 new Position(DistanceUnit.INCH, 36, 0, 0., 0), tol, false));
-        //mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, movePower, mPid,
-        //        new Position(DistanceUnit.INCH, -48, -48, 0., 0), tol, false));
         mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, movePower, mPid,
                 new Position(DistanceUnit.INCH, 0, 0, 0., 0), tol, false));
 
         mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, movePower, mPid,
                 new Position(DistanceUnit.INCH, 0, 36, 0., 0), tol, false));
-        mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, -movePower, mPid,
+        mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, -movePower, mPid,                   // do this move backwards!
                 new Position(DistanceUnit.INCH, 36, 36, 0., 0), tol, false));
         mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, -movePower, mPid,                   // do this move backwards!
                 new Position(DistanceUnit.INCH, 36, 0, 0., 0), tol, false));
-        //mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, -movePower, mPid,                   // do this move backwards!
-        //        new Position(DistanceUnit.INCH, -48, -48, 0., 0), tol, false));
         mSequence.add(new PosIntDriveToStep(this, mPosInt, rh.mMotors, movePower, mPid,
                 new Position(DistanceUnit.INCH, 0, 0, 0., 0), tol, false));
 
@@ -317,7 +249,6 @@ public class PosIntDriveTestOp extends OpMode {
     }
 
     public void stop() {
-        super.stop();
     }
 }
 

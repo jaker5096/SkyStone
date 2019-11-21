@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.view.View;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.LightSensor;
@@ -14,7 +15,7 @@ import com.qualcomm.robotcore.hardware.LightSensor;
  * Test light sensor hardware
  */
 @Autonomous(name="Test: Light Sensor Test 1", group ="Test")
-//@Disabled
+@Disabled
 public class LightSensorTestOp extends OpMode {
 
     private LightSensor mLightSensor;

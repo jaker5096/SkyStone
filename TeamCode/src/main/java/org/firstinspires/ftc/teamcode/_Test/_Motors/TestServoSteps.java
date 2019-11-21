@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode._Test._Motors;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -20,7 +21,7 @@ class UntilStep extends AutoLib.Step {
 }
 
 @Autonomous(name="Test: TestServoSteps", group ="Test")
-//@Disabled
+@Disabled
 public class TestServoSteps extends OpMode {
 
     Servo mMotor;

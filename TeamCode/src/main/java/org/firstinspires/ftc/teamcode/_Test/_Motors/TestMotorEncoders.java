@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode._Test._Motors;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.teamcode._Libs.AutoLib;
  * Test hardware gyro
  */
 @Autonomous(name="Test: Motor Encoder Test 1", group ="Test")
-//@Disabled
+@Disabled
 public class TestMotorEncoders extends OpMode {
 
     DcMotor mMotor1, mMotor2;

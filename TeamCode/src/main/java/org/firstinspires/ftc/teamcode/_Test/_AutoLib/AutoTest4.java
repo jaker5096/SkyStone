@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode._Test._AutoLib;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode._Libs.AutoLib;
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.teamcode._Libs.ToggleButton;
  * This one tests the Switch Step construct.
  * Created by phanau on 1/25/19.
  */
-
+@Disabled
 class myDynamicCaseStep extends AutoLib.Step {
     OpMode mOpmode;
     AutoLib.SwitchStep2 mTarget;
@@ -52,7 +53,7 @@ class mySwitchStep extends AutoLib.SwitchStep {
 }
 
 @Autonomous(name="Test: AutoLib Switch Test", group ="Test")
-//@Disabled
+@Disabled
 public class AutoTest4 extends OpMode {
 
     AutoLib.Sequence mSequence;     // the root of the sequence tree

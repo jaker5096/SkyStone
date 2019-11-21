@@ -2,12 +2,13 @@ package org.firstinspires.ftc.teamcode._Test._AutoLib;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode._Libs.AutoLib;
 
 // This test illustrates using a shared Context object to share data among multiple Steps
-
+@Disabled
 class Context {
     public int value1;
     public String value2;
@@ -92,7 +93,7 @@ class DataUserStep3 extends AutoLib.LogTimeStep {
 
 
 @Autonomous(name="Test: Step Shared Context Test", group ="Test")
-//@Disabled
+@Disabled
 public class AutoTest5 extends OpMode {
 
     AutoLib.Sequence mSequence;     // the root of the sequence tree

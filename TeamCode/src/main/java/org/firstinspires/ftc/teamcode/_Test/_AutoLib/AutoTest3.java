@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode._Test._AutoLib;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode._Libs.AutoLib;
@@ -28,7 +29,7 @@ class ButtonXStep extends AutoLib.Step {
 
 
 @Autonomous(name="Test: AutoLib If-Then-Else Test", group ="Test")
-//@Disabled
+@Disabled
 public class AutoTest3 extends OpMode {
 
     AutoLib.Sequence mSequence;     // the root of the sequence tree
